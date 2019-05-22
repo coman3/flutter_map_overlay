@@ -13,7 +13,7 @@ class GoogleMapOptions {
     this.mapType = MapType.normal,
     this.minMaxZoomPreference = MinMaxZoomPreference.unbounded,
     this.scrollGesturesEnabled = true,
-    this.zoomGesturesEnabled = false,
+    this.zoomGesturesEnabled = true,
     this.myLocationEnabled = false,
     this.myLocationButtonEnabled = true,
     this.markers,
