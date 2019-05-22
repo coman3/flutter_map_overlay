@@ -1,4 +1,4 @@
-# flutter_web_overlay
+# flutter_map_overlay
 A simple to use widget based map overlay plugin for flutter.
 
 # WARNING: In very early Development
