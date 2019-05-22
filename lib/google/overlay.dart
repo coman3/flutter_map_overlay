@@ -5,42 +5,58 @@ import 'package:map_overlay/map_overlay.dart';
 
 import 'options.dart';
 
+class _MapUpdate {
+  _MapUpdate(
+    this.position,
+    this.bounds,
+  );
+
+  final CameraPosition position;
+  final LatLngBounds bounds;
+}
+
 class GoogleMapOverlay extends StatefulWidget {
-  GoogleMapOverlay({Key key, this.mapOptions, this.overlays}) : super(key: key);
+  GoogleMapOverlay(
+      {Key key, this.mapOptions, this.overlays, this.delayMilliseconds})
+      : super(key: key);
   final GoogleMapOptions mapOptions;
   final List<MapOverlayWidgetContainer> overlays;
+
+  final int delayMilliseconds;
 
   @override
   _GoogleMapOverlayState createState() => _GoogleMapOverlayState();
 }
 
 class _GoogleMapOverlayState extends State<GoogleMapOverlay> {
-  Completer<GoogleMapController> _controller = Completer();
-  StreamController<CameraPosition> _streamController =
-      new StreamController<CameraPosition>();
+  GoogleMapController _controller;
+  StreamController<_MapUpdate> _streamController =
+      new StreamController<_MapUpdate>();
 
-  Widget buildOverlay(
-      BuildContext context,
-      AsyncSnapshot<LatLngBounds> snapshot,
-      AsyncSnapshot<CameraPosition> position) {
-    if (snapshot.data == null || position.data == null) return Container();
+  Widget buildOverlay(BuildContext context, _MapUpdate update) {
+    if (update == null || update.bounds == null || update.position == null)
+      return Container();
 
     return Stack(
       children: widget.overlays
-          .map(
-              (element) => element.build(context, snapshot.data, position.data)).where((item) => item != null)
+          .map((element) =>
+              element.build(context, update.bounds, update.position))
+          .where((item) => item != null)
           .toList(),
     );
   }
 
   void onMapCreated(GoogleMapController controller) {
-    _controller.complete(controller);
+    _controller = controller;
     if (widget.mapOptions.onMapCreated != null)
       widget.mapOptions.onMapCreated(controller);
   }
 
-  void onCameraMove(CameraPosition position) {
-    _streamController.add(position);
+  void onCameraMove(CameraPosition position) async {
+    var visibleRegion = await _controller.getVisibleRegion();
+    Future.delayed(Duration(milliseconds: widget.delayMilliseconds)).then(
+        (_) => _streamController.add(_MapUpdate(position, visibleRegion)));
+
     if (widget.mapOptions.onCameraMove != null)
       widget.mapOptions.onCameraMove(position);
   }
@@ -48,11 +64,7 @@ class _GoogleMapOverlayState extends State<GoogleMapOverlay> {
   Widget buildUpdater(BuildContext context) {
     return StreamBuilder(
       stream: _streamController.stream,
-      builder: (_, position) => FutureBuilder(
-            future: _Extensions.mapControllerToViewRegion(_controller.future),
-            builder: (context, snapshot) =>
-                buildOverlay(context, snapshot, position),
-          ),
+      builder: (_, update) => buildOverlay(context, update.data),
     );
   }
 
