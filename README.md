@@ -7,13 +7,13 @@ There will be breaking API changes.
 
 
 # Planned Features
- - [] Support for other maping platforms (such as MapBox or Bing Maps)
+ - [ ] Support for other maping platforms (such as MapBox or Bing Maps)
 	- I'd like to see a unified API that supports it all but it may not be possible / feasible
- - [] Support for Pan and Tilt operations (curently disabled)
- - [] Support for either 'Ground Plane' or 'Upright Plane' display modes 
+ - [ ] Support for Pan and Tilt operations (curently disabled)
+ - [ ] Support for either 'Ground Plane' or 'Upright Plane' display modes 
 	- Ground Plane will be like a sticker on top of the map
 	- Upright Plane will be like a 'building' that stands upright and faces the screen at all times
- - [] Implement a custom gesture controller to ensure that the widgets move at the same speed as the map
+ - [ ] Implement a custom gesture controller to ensure that the widgets move at the same speed as the map
 	- The controller will override the google maps gesture controlls for a smoother pan speed
 
 ---
